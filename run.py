@@ -10,20 +10,15 @@ config.sat_backend = "kissat"
 E = Encoding()
 
 class Cursor():
-    def __init__(self,x,y,is_hori,is_vert):
+    def __init__(self,x,y,is_hori,):
         self.x = x
         self.y = y
-        #
-        #   may adjust so self.is_vert = not is_hori
-        #   this means that only one of these two variables will exist
-        #   based on own constraints: (H | V) & ~(H & V)
-        #
         self.is_hori = is_hori
-        self.is_vert = is_vert
 
     def __str__(self) -> str:
-        return f"Cursor located at x:{self.x} y:{self.y},\n
-        Horizontal:{self.is_hori} Vertical:{self.is_vert}"
+        return f("Cursor at x:{self.x} y:{self.y},\n Facing Horizontally" 
+                 if self.is_hori else 
+                 "Cursor at x:{self.x} y:{self.y},\n Facing Vertically")
     
 class Ball():
     def __init__(self,x,y,pos_hori_dir,pos_vert_dir):
@@ -33,19 +28,21 @@ class Ball():
         self.pos_vert_dir = pos_vert_dir
 
     def __str__(self) -> str:
-        return f"Ball located at x:{self.x} y:{self.y},\n
+        return f"Ball at x:{self.x} y:{self.y},\n
         Horizontal direction:{self.is_hori} Vertical direction:{self.is_vert}"
     
 class Builder():
-    def __init__(self,x,y,is_hori,is_vert):
+    def __init__(self,x,y,is_hori):
         self.x = x
         self.y = y
         self.is_hori = is_hori
-        self.is_vert = is_vert
 
     def __str__(self) -> str:
-        return f"Builder located at x:{self.x} y:{self.y},\n
-        Horizontal build:{self.is_hori} Vertical build:{self.is_vert}"
+        return f"Builder at x:{self.x} y:{self.y},\n
+        Horizontal build:{self.is_hori} Vertical build:{not(self.is_hori)}"
+
+@proposition
+
 
 
 # USE ONLY AS REFERENCE
