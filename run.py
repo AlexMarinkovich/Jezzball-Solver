@@ -16,7 +16,7 @@ class Cursor():
         self.is_hori = is_hori
 
     def __str__(self) -> str:    
-        return f("Cursor at "+ self.x +","+ self.y +"\nFacing "
+        return f("Cursor at x:"+ self.x +" y:"+ self.y +"\nFacing "
             + ("Horizontally" if self.is_hori else "Vertically"))
     
 class Ball():
@@ -27,8 +27,10 @@ class Ball():
         self.pos_vert_dir = pos_vert_dir
 
     def __str__(self) -> str:
-        return f"Ball at x:{self.x} y:{self.y},\n
-        Horizontal direction:{self.is_hori} Vertical direction:{self.is_vert}"
+        return f("Ball at x:{self.x} y:{self.y}, Going in:\n"+ 
+                ("Positive" if {self.pos_hori_dir} else "Negative") +"x direction\n"+ 
+                ("Positive" if {self.pos_vert_dir} else "Negative") +"y direction"
+                )
     
 class Builder():
     def __init__(self,x,y,is_hori):
@@ -37,7 +39,7 @@ class Builder():
         self.is_hori = is_hori
 
     def __str__(self) -> str:
-        return f("Builder at "+ self.x +","+ self.y +"\nBuilding "
+        return f("Builder at x:"+ self.x +" y:"+ self.y +"\nBuilding "
             + ("Horizontally" if self.is_hori else "Vertically"))
 
 @proposition
