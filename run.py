@@ -1,6 +1,7 @@
 
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
+import random
 
 # These two lines make sure a faster SAT solver is used.
 from nnf import config
@@ -9,6 +10,14 @@ config.sat_backend = "kissat"
 # Encoding that will store all of your constraints
 E = Encoding()
 
+# x width, y height
+CANV_WT = 1200
+CANV_HT = 800
+STAGE = [null,1,2,3,4]
+# defaults to stage 1
+current_stage = 1
+
+@proposition
 class Cursor():
     def __init__(self,x,y,is_hori,):
         self.x = x
@@ -19,6 +28,7 @@ class Cursor():
         return f("Cursor at x:"+ self.x +" y:"+ self.y +"\nFacing "
             + ("Horizontally" if self.is_hori else "Vertically"))
     
+@proposition
 class Ball():
     def __init__(self,x,y,pos_hori_dir,pos_vert_dir):
         self.x = x
@@ -32,6 +42,7 @@ class Ball():
                 ("Positive" if {self.pos_vert_dir} else "Negative") +"y direction"
                 )
     
+@proposition
 class Builder():
     def __init__(self,x,y,is_hori):
         self.x = x
@@ -41,9 +52,15 @@ class Builder():
     def __str__(self) -> str:
         return f("Builder at x:"+ self.x +" y:"+ self.y +"\nBuilding "
             + ("Horizontally" if self.is_hori else "Vertically"))
-
-@proposition
-
+    
+# generates a game ball based on the stage number
+game_ball=[]
+for i in range(current_stage):
+    x = random.randint(0,CANV_WT)
+    y = random.randint(0,CANV_HT)
+    pos_hori_dir = bool(random.getrandbits(1))
+    pos_vert_dir = bool(random.getrandbits(1))
+    game_ball.append(Ball(x,y,pos_hori_dir,pos_vert_dir))
 
 
 # USE ONLY AS REFERENCE
