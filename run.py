@@ -1,4 +1,4 @@
-from inputs import CURSOR_ORIENTATION, BALLS, CANVAS
+from inputs import CURSOR_ORIENTATION, CURSOR_POSITION, BALLS, CANVAS
 
 CANV_CELLS_WIDTH = len(CANVAS[0])
 CANV_CELLS_HEIGHT = len(CANVAS)
@@ -193,6 +193,33 @@ def theory():
     # The cursor's orientation can only be either vertical or horizontal, but not both
     E.add_constraint((Horizontal() & ~Vertical()) | (~Horizontal() & Vertical()))
 
+    # intialize builders
+    x, y = CURSOR_POSITION
+    E.add_constraint(Horizontal() >> (Builder("E", x, y, 0) & Builder("W", x, y, 0)))
+    E.add_constraint(Vertical() >> (Builder("N", x, y, 0) & Builder("S", x, y, 0)))
+
+    # initialize balls and ball velocities
+    for i, (x, y, x_vel, y_vel) in enumerate(BALLS):
+        E.add_constraint(BallPosition(i, x, y, 0))
+
+        if x_vel > 0:
+            E.add_constraint(BallVelocityX(i, 0))
+        else:
+            E.add_constraint(~BallVelocityX(i, 0))
+
+        if y_vel > 0:
+            E.add_constraint(BallVelocityY(i, 0))
+        else:
+            E.add_constraint(~BallVelocityY(i, 0))
+
+    # initialize captured cells
+    for y in range(len(CANVAS)):
+        for x in range(len(CANVAS[0])):
+            if CANVAS[y][x] == 1:
+                E.add_constraint(CapturedCell(x, y, 0))
+            else:
+                E.add_constraint(~CapturedCell(x, y, 0))
+    
     # A captured cell stays captured
     for t in range(MAX_BUILD_TIME-1):
         for y in range(CANV_CELLS_HEIGHT):
