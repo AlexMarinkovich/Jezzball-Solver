@@ -32,9 +32,11 @@ class Hashable:
 
 ########## PROPOSITION CLASSES ##########
 
-# H – This is true if the horizontal orientation is selected
 @proposition(E)
 class Horizontal(Hashable):
+    '''
+    H - This is true if the horizontal orientation is selected
+    '''
     def __init__(self):
         pass
 
@@ -42,9 +44,11 @@ class Horizontal(Hashable):
         return "The mouse has a horizontal orientation"
 
 
-# V – This is true if the vertical orientation is selected
 @proposition(E)
 class Vertical(Hashable):
+    '''
+    V - This is true if the vertical orientation is selected
+    '''
     def __init__(self):
         pass
 
@@ -52,9 +56,12 @@ class Vertical(Hashable):
         return "The mouse has a vertical orientation"
 
 
-# M(x, y) – This is true if cell (x, y) is where the cursor/mouse is (i.e. the starting position of where the line is created)
 @proposition(E)
 class CursorPosition(Hashable):
+    '''
+    M(x, y) - This is true if cell (x, y) is where the cursor/mouse is
+    (i.e. the starting position of where the line is created)
+    '''
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -62,21 +69,28 @@ class CursorPosition(Hashable):
     def __str__(self) -> str:
         return f"The cursor is at ({self.x}, {self.y})"
 
-# BC(x, y, t) - This is true if a cell (x, y) is currently being built at time t (and you'll lose a life if a ball collides with it)
+
 @proposition(E)
 class BuildingCell(Hashable):
-    def __init__(self, x, y, time):
+    '''
+    BC(D, x, y, t) - This is true if cell (x, y) is currently being built by the 
+    builder of direction D at time t (and you'll lose a life if a ball collides with it)
+    '''
+    def __init__(self, direction, x, y, time):
+        self.direction = direction
         self.x = x
         self.y = y
         self.time = time
 
     def __str__(self) -> str:
-        return f"The cell at ({self.x}, {self.y}) is currently being built at {self.time}"
+        return f"The cell at ({self.x}, {self.y}) is currently being built at time {self.time}"
 
 
-# C(x, y, t) – This is true if cell (x, y) is captured (i.e. the black cells) at time t
 @proposition(E)
 class CapturedCell(Hashable):
+    '''
+    C(x, y, t) - This is true if cell (x, y) is captured (i.e. the black cells) at time t
+    '''
     def __init__(self, x, y, time):
         self.x = x
         self.y = y
@@ -86,9 +100,11 @@ class CapturedCell(Hashable):
         return f"The cell ({self.x}, {self.y}) is captured at time {self.time}"
 
 
-# P(i, x, y, t) – This is true if ball i's position is at cell (x, y) at time t
 @proposition(E)
 class BallPosition(Hashable):
+    '''
+    P(i, x, y, t) - This is true if ball i's position is at cell (x, y) at time t
+    '''
     def __init__(self, ball_id, x, y, time):
         self.ball_id = ball_id
         self.x = x
@@ -99,9 +115,11 @@ class BallPosition(Hashable):
         return f"Ball {self.ball_id} is at ({self.x}, {self.y}) at time {self.time}"
 
 
-#Vx(i, t) – This is true if ball i is currently moving in the positive X direction at time t
 @proposition(E)
 class BallVelocityX(Hashable):
+    '''
+    Vx(i, t) - This is true if ball i is currently moving in the positive X direction at time t
+    '''
     def __init__(self, ball_id, time):
         self.ball_id = ball_id
         self.time = time
@@ -110,9 +128,11 @@ class BallVelocityX(Hashable):
         return f"Ball {self.ball_id} is moving in the positive X direction at time {self.time}"
 
 
-#Vy(i, t) – This is true if ball i is currently moving in the positive Y direction at time t
 @proposition(E)
 class BallVelocityY(Hashable):
+    '''
+    Vy(i, t) - This is true if ball i is currently moving in the positive Y direction at time t
+    '''
     def __init__(self, ball_id, time):
         self.ball_id = ball_id
         self.time = time
@@ -121,9 +141,11 @@ class BallVelocityY(Hashable):
         return f"Ball {self.ball_id} is moving in the positive Y direction at time {self.time}"
 
 
-# B(D, x, y, t) – This is true if the builder of direction D (can be N, E, S, W) is at cell (x, y) at time t
 @proposition(E)
 class Builder(Hashable):
+    '''
+    B(D, x, y, t) - This is true if the builder of direction D (can be N, E, S, W) is at cell (x, y) at time t
+    '''
     def __init__(self, direction, x, y, time):
         self.direction = direction
         self.x = x
@@ -134,9 +156,11 @@ class Builder(Hashable):
         return f"The {self.direction} builder is at cell ({self.x}, {self.y}) at time {self.time}"
 
 
-# BF(D, t) - This is true if the builder of direction D is finished building at time t 
 @proposition(E)
 class BuilderFinished(Hashable):
+    '''
+    BF(D, t) - This is true if the builder of direction D is finished building at time t 
+    '''
     def __init__(self, direction, time):
         self.direction = direction
         self.time = time
@@ -144,11 +168,14 @@ class BuilderFinished(Hashable):
     def __str__(self) -> str:
         return f"The {self.direction} builder is finished building at time {self.time}"
 
-# L – This is true if the player will lose a life from creating a line
+
 @proposition(E)
 class LoseLife(Hashable):
-    def __init__(self):
-        pass
+    '''
+    L - This is true if the player has lost a life from creating a line at time t or before
+    '''
+    def __init__(self, time):
+        self.time = time
 
     def __str__(self) -> str:
         return "The player will lose a life from creating a line"
@@ -169,19 +196,20 @@ for t in range(MAX_BUILD_TIME):
     for y in range(CANV_CELLS_HEIGHT):
         for x in range(CANV_CELLS_WIDTH):
             captured_cell_props.append(CapturedCell(x, y, t))
-            building_cell_props.append(BuildingCell(x, y, t))
+            for d in DIRECTIONS:
+                building_cell_props.append(BuildingCell(d, x, y, t))
 
 ball_pos_props = []
 ball_vel_x_props = []
 ball_vel_y_props = []
-for i in range(len(BALLS)):
+for b in range(len(BALLS)):
     for t in range(MAX_BUILD_TIME):
-        ball_vel_x_props.append(BallVelocityX(i, t))
-        ball_vel_y_props.append(BallVelocityY(i, t))
+        ball_vel_x_props.append(BallVelocityX(b, t))
+        ball_vel_y_props.append(BallVelocityY(b, t))
 
         for y in range(CANV_CELLS_HEIGHT):
             for x in range(CANV_CELLS_WIDTH):
-                ball_pos_props.append(BallPosition(i, x, y, t))
+                ball_pos_props.append(BallPosition(b, x, y, t))
 
 builder_props = []
 for d in DIRECTIONS:
@@ -190,11 +218,16 @@ for d in DIRECTIONS:
             for x in range(CANV_CELLS_WIDTH):
                 builder_props.append(Builder(d, x, y, t))
 
-lose_prop = LoseLife()
+lose_props = []
+for t in range(MAX_BUILD_TIME):
+    lose_props.append(LoseLife(t))
 
 
 ########## CONSTRAINTS ##########
 def theory():
+    # intitialize lose life:
+    E.add_constraint(LoseLife(0))
+
     # initialize cursor orientation
     if CURSOR_ORIENTATION == "H":
         E.add_constraint(Horizontal())
@@ -208,7 +241,12 @@ def theory():
     x, y = CURSOR_POSITION
     E.add_constraint(Horizontal() >> (Builder("E", x, y, 0) & Builder("W", x, y, 0)))
     E.add_constraint(Vertical() >> (Builder("N", x, y, 0) & Builder("S", x, y, 0)))
-    
+    for t in range(MAX_BUILD_TIME):
+        constraint.add_at_most_k(E, 2, [Builder(d, x, y, t) 
+                                        for x in range(CANV_CELLS_WIDTH) 
+                                        for y in range(CANV_CELLS_HEIGHT)
+                                        for d in DIRECTIONS])
+
     # initialize balls and ball velocities
     for i, (x, y, x_vel, y_vel) in enumerate(BALLS):
         E.add_constraint(BallPosition(i, x, y, 0))
@@ -222,64 +260,129 @@ def theory():
             E.add_constraint(BallVelocityY(i, 0))
         else:
             E.add_constraint(~BallVelocityY(i, 0))
+    
+    for t in range(MAX_BUILD_TIME):
+        constraint.add_at_most_k(E, len(BALLS), [BallPosition(b, x, y, t) 
+                                        for x in range(CANV_CELLS_WIDTH) 
+                                        for y in range(CANV_CELLS_HEIGHT) 
+                                        for b in range(len(BALLS))])
+
+    # balls move based on their velocities after a step in time to next cell if that cell isn't captured
+    for b in range(len(BALLS)):
+        for y in range(CANV_CELLS_HEIGHT):
+            for x in range(CANV_CELLS_WIDTH):
+                for t in range(MAX_BUILD_TIME):
+                    E.add_constraint(BallPosition(b, x, y, t) & BallVelocityX(b, t) & BallVelocityY(b, t) & ~CapturedCell(x+1, y+1, t) >> BallPosition(b, x+1, y+1, t+1))
+                    E.add_constraint(BallPosition(b, x, y, t) & ~BallVelocityX(b, t) & BallVelocityY(b, t) & ~CapturedCell(x-1, y+1, t) >> BallPosition(b, x-1, y+1, t+1))
+                    E.add_constraint(BallPosition(b, x, y, t) & BallVelocityX(b, t) & ~BallVelocityY(b, t) & ~CapturedCell(x+1, y-1, t) >> BallPosition(b, x+1, y-1, t+1))
+                    E.add_constraint(BallPosition(b, x, y, t) & ~BallVelocityX(b, t) & ~BallVelocityY(b, t) & ~CapturedCell(x-1, y-1, t) >> BallPosition(b, x-1, y-1, t+1))
+
+    # balls bounce off of captured cells or the border
+    for b in range(len(BALLS)):
+        for t in range(MAX_BUILD_TIME):
+            for y in range(CANV_CELLS_HEIGHT):
+                for x in range(CANV_CELLS_WIDTH):
+                    if x > 0:
+                        E.add_constraint(BallPosition(b, x, y, t) & ~BallVelocityX(b, t-1) & CapturedCell(x-1, y, t) >> BallVelocityX(b, t))
+                    else:
+                        E.add_constraint(BallPosition(b, x, y, t) & ~BallVelocityX(b, t-1) >> BallVelocityX(b, t))
+
+                    if x < CANV_CELLS_WIDTH - 1:
+                        E.add_constraint(BallPosition(b, x, y, t) & BallVelocityX(b, t-1) & CapturedCell(x+1, y, t) >> ~BallVelocityX(b, t))
+                    else:
+                        E.add_constraint(BallPosition(b, x, y, t) & BallVelocityX(b, t-1) >> ~BallVelocityX(b, t))
+
+                    if y > 0:
+                        E.add_constraint(BallPosition(b, x, y, t) & ~BallVelocityY(b, t-1) & CapturedCell(x, y-1, t) >> BallVelocityY(b, t))
+                    else:
+                        E.add_constraint(BallPosition(b, x, y, t) & ~BallVelocityY(b, t-1) >> BallVelocityY(b, t))
+                    
+                    if y < CANV_CELLS_HEIGHT - 1:
+                        E.add_constraint(BallPosition(b, x, y, t) & BallVelocityY(b, t-1) & CapturedCell(x, y+1, t) >> ~BallVelocityY(b, t))
+                    else:
+                        E.add_constraint(BallPosition(b, x, y, t) & BallVelocityY(b, t-1) >> ~BallVelocityY(b, t))
+       
+
+    # When a ball collides with a building cell, the player loses a life
+    for y in range(CANV_CELLS_HEIGHT):
+        for x in range(CANV_CELLS_WIDTH):
+            for t in range(MAX_BUILD_TIME):
+                for b in range(len(BALLS)):
+                    for d in DIRECTIONS:
+                        E.add_constraint((BallPosition(b, x, y, t) & BuildingCell(d, x, y, t)) >> LoseLife(t+1))
+                        E.add_constraint(~(BallPosition(b, x, y, t) & BuildingCell(d, x, y, t)) & ~LoseLife(t) >> ~LoseLife(t+1))
+    
+    for t in range(MAX_BUILD_TIME):
+        E.add_constraint(LoseLife(t) >> LoseLife(t+1))
 
     # initialize captured cells
-    for y in range(len(CANVAS)):
-        for x in range(len(CANVAS[0])):
+    for y in range(CANV_CELLS_HEIGHT):
+        for x in range(CANV_CELLS_WIDTH):
             if CANVAS[y][x] == 1:
                 E.add_constraint(CapturedCell(x, y, 0))
             else:
                 E.add_constraint(~CapturedCell(x, y, 0))
-    
+
+    # A builder creates a building cell and moves to the next cell after a step in time
+    for t in range(MAX_BUILD_TIME-1):
+        for y in range(CANV_CELLS_HEIGHT):
+            for x in range(CANV_CELLS_WIDTH):
+                if y > 0:
+                    E.add_constraint(Builder("N", x, y, t) & ~CapturedCell(x, y-1, t) >> Builder("N", x, y-1, t+1))
+                    E.add_constraint(Builder("N", x, y, t) & CapturedCell(x, y-1, t) >> BuilderFinished("N", t+1))
+                else:
+                    E.add_constraint(Builder("N", x, y, t) >> BuilderFinished("N", t+1))
+
+                if y < CANV_CELLS_HEIGHT - 1:
+                    E.add_constraint(Builder("S", x, y, t) & ~CapturedCell(x, y+1, t) >> Builder("S", x, y+1, t+1))
+                    E.add_constraint(Builder("S", x, y, t) & CapturedCell(x, y+1, t) >> BuilderFinished("S", t+1))
+                else:
+                    E.add_constraint(Builder("S", x, y, t) >> BuilderFinished("S", t+1))
+
+                if x > 0:
+                    E.add_constraint(Builder("W", x, y, t) & ~CapturedCell(x-1, y, t) >> Builder("W", x-1, y, t+1))
+                    E.add_constraint(Builder("W", x, y, t) & CapturedCell(x-1, y, t) >> BuilderFinished("W", t+1))
+                else:
+                    E.add_constraint(Builder("W", x, y, t) >> BuilderFinished("W", t+1))
+
+                if x < CANV_CELLS_WIDTH - 1:
+                    E.add_constraint(Builder("E", x, y, t) & ~CapturedCell(x+1, y, t) >> Builder("E", x+1, y, t+1))
+                    E.add_constraint(Builder("E", x, y, t) & CapturedCell(x+1, y, t) >> BuilderFinished("E", t+1))
+                else:
+                    E.add_constraint(Builder("E", x, y, t) >> BuilderFinished("E", t+1))
+
+                for d in DIRECTIONS:
+                    E.add_constraint(Builder(d, x, y, t) >> BuildingCell(d, x, y, t))
+
+    # A building cell stays until its builder is done, in which case it will turn into a captured cell
+    for t in range(MAX_BUILD_TIME-1):
+        for y in range(CANV_CELLS_HEIGHT):
+            for x in range(CANV_CELLS_WIDTH):
+                for d in DIRECTIONS:
+                    E.add_constraint(BuildingCell(d, x, y, t) & ~BuilderFinished(d, t) >> BuildingCell(d, x, y, t+1))
+                    E.add_constraint(BuildingCell(d, x, y, t) & BuilderFinished(d, t) >> CapturedCell(x, y, t+1))
+
     # A captured cell stays captured
     for t in range(MAX_BUILD_TIME-1):
         for y in range(CANV_CELLS_HEIGHT):
             for x in range(CANV_CELLS_WIDTH):
                 E.add_constraint(CapturedCell(x, y, t) >> CapturedCell(x, y, t+1))
 
-    # A builder creates a building cell and moves to the next cell after a step in time
-    for t in range(MAX_BUILD_TIME):
-        for y in range(CANV_CELLS_HEIGHT):
-            for x in range(CANV_CELLS_WIDTH):
-                if y > 0:
-                    E.add_constraint(Builder("N", x, y, t) >> Builder("N", x, y-1, t))
-
-                if y < CANV_CELLS_HEIGHT - 1:
-                    E.add_constraint(Builder("S", x, y, t) >> Builder("S", x, y+1, t))
-
-                if x > 0:
-                    E.add_constraint(Builder("W", x, y, t) >> Builder("W", x, x-1, t))
-
-                if x < CANV_CELLS_WIDTH - 1:
-                    E.add_constraint(Builder("E", x, y, t) >> Builder("E", x+1, y, t))
-
-                for d in DIRECTIONS:
-                    E.add_constraint(Builder(d, x, y, t) >> BuildingCell(x, y, t))
-
-    # A building cell stays until the builders are done
+    # A noncaptured cell stays noncaptured if nothing happens to it
     for t in range(MAX_BUILD_TIME-1):
         for y in range(CANV_CELLS_HEIGHT):
             for x in range(CANV_CELLS_WIDTH):
-                ...
-
+                for d in DIRECTIONS:
+                    E.add_constraint(~(BuildingCell(d, x, y, t) & BuilderFinished(d, t)) & ~CapturedCell(x, y, t) >> ~CapturedCell(x, y, t+1))
+    
+    
     # The position of a ball cannot coincide with the position of a captured cell (BUGS UNTIL LOGIC IS IMPLEMENTED)
     # for i in range(len(BALLS)):
     #     for t in range(MAX_BUILD_TIME):
     #         for y in range(CANV_CELLS_HEIGHT):
     #             for x in range(CANV_CELLS_WIDTH):
     #                 E.add_constraint(BallPosition(i, x, y, t) >> ~CapturedCell(x, y, t))
-        
-    # There can't be both a horizontal builder and vertical builder
-    for t in range(MAX_BUILD_TIME):
-        for y in range(CANV_CELLS_HEIGHT):
-            for x in range(CANV_CELLS_WIDTH):
-                E.add_constraint((Builder("N", x, y, t) | Builder("S", x, y, t)) >> ~(Builder("E", x, y, t) | Builder("W", x, y, t)))
-                E.add_constraint((Builder("E", x, y, t) | Builder("W", x, y, t)) >> ~(Builder("N", x, y, t) | Builder("S", x, y, t)))
-
-
-    # TEMPORARY:
-    E.add_constraint(LoseLife())
-
+    
     return E
 
 if __name__ == "__main__":
@@ -292,7 +395,24 @@ if __name__ == "__main__":
     # print("   Solution: %s" % T.solve())
     
     sol = T.solve()
-    # print(sol)
+    # for a,b in sol.items():
+    #     print(a,b)
+
+    for t in range(MAX_BUILD_TIME):
+        final_map = [[int(sol[f"The cell ({x}, {y}) is captured at time {0}"])
+                    for x in range(CANV_CELLS_WIDTH)] 
+                    for y in range(CANV_CELLS_HEIGHT)]
+        
+        for y in range(len(final_map)):
+            for x in range(len(final_map[0])):
+                for d in DIRECTIONS:
+                    if sol[f"The {d} builder is at cell ({x}, {y}) at time {0}"]:
+                        final_map[y][x] = 2
+
+        print(f'{t=}')
+        print(*final_map, sep='\n')
+        print()
+
     if sol["The player will lose a life from creating a line"]:
         print("You will lose a life")
     else:

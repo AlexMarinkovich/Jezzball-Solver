@@ -1,8 +1,8 @@
 CURSOR_ORIENTATION = "H" # can be "H" or "V" for horizontal or vertical
 
-CURSOR_POSITION = (0, 0) # (x, y)
+CURSOR_POSITION = (3, 2) # (x, y)
 
-BALLS = [(0, 0, 1, 1), 
+BALLS = [(1, 1, 1, 1), 
          (5, 5, -1, 1), 
          (10, 10, 1, 1),
          (15, 15, 1, -1)]  # (x, y, x_vel, y_vel)
