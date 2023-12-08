@@ -360,7 +360,7 @@ def theory():
     # When a ball collides with a building cell, the player loses a life
     for y in range(CANV_CELLS_HEIGHT):
         for x in range(CANV_CELLS_WIDTH):
-            for t in range(MAX_BUILD_TIME):
+            for t in range(MAX_BUILD_TIME-1):
                 for b in range(len(BALLS)):
                     for d in DIRECTIONS:
                         E.add_constraint((BallPosition(b, x, y, t) & BuildingCell(d, x, y, t)) >> LoseLife(t+1))
